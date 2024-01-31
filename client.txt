@@ -1,0 +1,64 @@
+
+#libraries
+
+func main{
+
+    string prgrmID = "0000001 V2.3 CinsCalculator"
+
+    msgbuf msg
+    msg.mtype = 0
+    msg.mtext = programID
+    
+    msgbuf receivedMsg
+    
+    key_t key = ftok("/home",'M')
+    int msgid = msgget(key,0666)
+    if(msgid == 1){
+        print("Message queue id err")    
+        exit()
+    }
+
+    if(msgsnd(msgid,&msg,msg.mtext.length)==-1) {
+        print("Message queue send err")
+        exit()
+    }else{
+
+       
+        if(msgrcv(msgid , &receivedMsg , prgrmID.substring(0,prgrmID.indexOf(' ')))==-1){
+            exit()
+        }
+
+        if(receivedMsg.mtext == msg.mtext){
+            print("Program is up to date")
+            print(receivedMsg.mtext)
+
+        
+        }else{  
+
+            
+            int shmid = (int)receivedMsg.mtext.substring(receivedMsg.lastIndexOf(' ')+1)
+            if(shmid==-1)(
+                exit()
+            )
+            string *shmURL = (string *)shmat(shmid)
+            
+            
+            print("URL is "+shmURL)
+            print("Program is updated")
+
+            
+            shmctl(shmid , IPC_RMID)
+
+            
+            prgrmID =  receivedMsg.mtext.substring(0,receivedMsg.lastIndexOf(' '))
+            print("New prgrmID "+prgrmID)
+
+            
+        }
+    }
+    
+    //Program contiunes 
+
+
+
+}

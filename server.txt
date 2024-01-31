@@ -1,0 +1,59 @@
+#libraries
+
+
+func main{
+
+    
+    string newVersions[6]
+    string newURLs[6]
+    int serverID = 0
+
+    msgbuf receivedMsg
+    msgbuf sendedMsg
+    
+    key_t msgKey = ftok("/home",'M')
+    int msgid = msgget(msgKey,0666)
+    if(msgid == 1){
+        print("Message queue id err")
+        exit()   
+    }
+
+    
+    key_t shmKey = ftok("/temp",'C')
+    int shmID 
+    
+    while(1){
+        
+        if(msgrcv(msgid ,&receivedMsg,serverID) == -1){
+            print("Server err")
+            exit()
+        }else{
+            for(int i = 0 ; i<newVersions.length ; i++){
+
+                if(receivedMsg.mtext.substring(0,prgrmID.indexOf(' ')) == newVersions[i].substring(0,newVersions[i].indexOf(' '))){
+
+                    if(receivedMsg.mtext == newVersions[i]){
+                        
+                        sendedMsg.mtext = newVersions[i]
+                        sendedMsg.mtype = newVersions[i].substring(0,newVersions[i].indexOf(' '))
+                        msgsnd(msgid , &sendedMsg , sendedMsg.mtext.length)
+                        
+                    }else{
+                        shmID = shmget(shmKey , 30)
+                        string *shared_data = (string *)shmat(shmID)
+                        *shared_data = newURLs[i];
+
+                        sendedMsg.mtext = newVersions[i] + " " + shmID
+                        sendedMsg.mtype = newVersions[i].substring(0,newVersions[i].indexOf(' '))
+                        msgsnd(msgid , &sendedMsg , sendedMsg.mtext.length)
+                        
+                    }
+                    break
+                }
+            }
+            
+        }
+    }
+
+
+}
