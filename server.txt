@@ -1,5 +1,5 @@
 # Objective             : MULTIPLE Clients Check
-# CopyRight (C) 	: Muhammed Gökhan CİNSDİKİCİ
+# CopyRight (C) 	: Muhammet Gökhan CİNSDİKİCİ
 # Date                  : 1 February 2024
 # Code Repo             : IPC-ProblemSolution
 
