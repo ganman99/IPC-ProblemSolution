@@ -1,48 +1,72 @@
+# Objective             : MULTIPLE Clients Check
+# CopyRight (C) 	: Muhammed Cinsdikici ERDEM
+# Date                  : 1 January 2024
+# Code Repo             : IPC-ProblemSolution
+
+
 #libraries
 
 
 func main{
 
-    
+    #Server stores program`s version and URL in array.
     string newVersions[6]
     string newURLs[6]
+
+    #Server`s id.
     int serverID = 0
 
+    #Server creates message queue(message queue) structure.
     msgbuf receivedMsg
     msgbuf sendedMsg
-    
+
+    #Server creates a key then creates a message queue structure.
     key_t msgKey = ftok("/home",'M')
     int msgid = msgget(msgKey,0666)
+
+    #If message queue cannot be created,this process would kill itself.
     if(msgid == 1){
         print("Message queue id err")
         exit()   
     }
 
-    
+    #Server creates a shared memory in RAM in order to send URL to clients.
     key_t shmKey = ftok("/temp",'C')
     int shmID 
     
+
     while(1){
-        
+
+        #Server receives message from message queue.If there is a any problem,server would exit.
         if(msgrcv(msgid ,&receivedMsg,serverID) == -1){
             print("Server err")
             exit()
+
+	
         }else{
+
+	    #Server controls every version of clients.
             for(int i = 0 ; i<newVersions.length ; i++){
 
+		#If program id is equal to recevied message`s id.
                 if(receivedMsg.mtext.substring(0,prgrmID.indexOf(' ')) == newVersions[i].substring(0,newVersions[i].indexOf(' '))){
-
+			
+		    #Server checks equality of all things between received message and chosen string in newVersion array.
                     if(receivedMsg.mtext == newVersions[i]){
                         
+			#If there is an equality,server sends same message as received message to message queue.
                         sendedMsg.mtext = newVersions[i]
                         sendedMsg.mtype = newVersions[i].substring(0,newVersions[i].indexOf(' '))
                         msgsnd(msgid , &sendedMsg , sendedMsg.mtext.length)
                         
                     }else{
+
+			#If there is not equality,server would create shared memory then send URL to shared memory.
                         shmID = shmget(shmKey , 30)
                         string *shared_data = (string *)shmat(shmID)
                         *shared_data = newURLs[i];
-
+			
+			#Server sends a string includes new program id, version, program name and shared memory`s id.
                         sendedMsg.mtext = newVersions[i] + " " + shmID
                         sendedMsg.mtype = newVersions[i].substring(0,newVersions[i].indexOf(' '))
                         msgsnd(msgid , &sendedMsg , sendedMsg.mtext.length)

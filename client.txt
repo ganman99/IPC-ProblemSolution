@@ -1,55 +1,71 @@
+# Objective             : MULTIPLE Clients Check
+# CopyRight (C) 	: Muhammed Cinsdikici ERDEM
+# Date                  : 1 January 2024
+# Code Repo             : IPC-ProblemSolution
 
 #libraries
 
 func main{
 
+    #Client`s program id , version and name is created
     string prgrmID = "0000001 V2.3 CinsCalculator"
 
+    #Client creates message queue(message queue) structure and defines type and text.
     msgbuf msg
     msg.mtype = 0
     msg.mtext = programID
     
+    #Client creates another message queue structure in order to receive message from server.
     msgbuf receivedMsg
     
+    #Client creates a key then creates a message queue structure.
     key_t key = ftok("/home",'M')
     int msgid = msgget(key,0666)
-    if(msgid == 1){
+
+    #If message queue cannot be created,this process would kill itself.
+    if(msgid == -1){
         print("Message queue id err")    
         exit()
     }
-
+	
+    #Client sends message to message queue.If there is a any problem,client would exit.
     if(msgsnd(msgid,&msg,msg.mtext.length)==-1) {
         print("Message queue send err")
         exit()
+
     }else{
 
-       
+        #Client receives message from message queue.The message is sended by server to message queue.
+	#If there is any problem,program would exit
         if(msgrcv(msgid , &receivedMsg , prgrmID.substring(0,prgrmID.indexOf(' ')))==-1){
             exit()
         }
-
+	
+	#Program controls up to date.
         if(receivedMsg.mtext == msg.mtext){
             print("Program is up to date")
             print(receivedMsg.mtext)
 
-        
+        #If it is not up to date.
         }else{  
 
-            
+            #Client gets shared memory`s id. It is in end of the received message.
             int shmid = (int)receivedMsg.mtext.substring(receivedMsg.lastIndexOf(' ')+1)
             if(shmid==-1)(
                 exit()
             )
+
+	    #Client gets URL from shared memory.
             string *shmURL = (string *)shmat(shmid)
             
-            
+            #Prints URL in shared memory.
             print("URL is "+shmURL)
             print("Program is updated")
 
-            
+            #Clients removes shared memory.
             shmctl(shmid , IPC_RMID)
 
-            
+            #Client`s new prgrmID.
             prgrmID =  receivedMsg.mtext.substring(0,receivedMsg.lastIndexOf(' '))
             print("New prgrmID "+prgrmID)
 
@@ -57,7 +73,7 @@ func main{
         }
     }
     
-    //Program contiunes 
+    #Program contiunes 
 
 
 
