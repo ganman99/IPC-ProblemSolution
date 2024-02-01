@@ -1,6 +1,6 @@
 # Objective             : MULTIPLE Clients Check
 # CopyRight (C) 	: Muhammed Cinsdikici ERDEM
-# Date                  : 1 January 2024
+# Date                  : 1 February 2024
 # Code Repo             : IPC-ProblemSolution
 
 
